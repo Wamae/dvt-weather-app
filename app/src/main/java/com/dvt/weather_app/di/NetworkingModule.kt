@@ -1,6 +1,6 @@
 package com.dvt.weather_app.di
 
-import com.dvt.weather_app.networking.OpenWeatherMapApi
+import com.dvt.weather_app.networking.OpenWeatherMapApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +25,6 @@ object NetworkingModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): OpenWeatherMapApi =
-        retrofit.create(OpenWeatherMapApi::class.java)
+    fun provideApiService(retrofit: Retrofit): OpenWeatherMapApiService =
+        retrofit.create(OpenWeatherMapApiService::class.java)
 }

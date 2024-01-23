@@ -29,8 +29,8 @@ data class CurrentWeatherResponse(
     val timezone: Int,
     @SerializedName("visibility")
     val visibility: Int,
-    // @SerializedName("weather")
-    // val weather: List<Weather>,
+    @SerializedName("weather")
+    val weather: List<Weather>,
     @SerializedName("wind")
     val wind: Wind
 ) : Parcelable
