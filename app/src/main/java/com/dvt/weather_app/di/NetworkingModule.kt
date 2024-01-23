@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkingModule {
     @Provides
-    fun provideBaseUrl(): String = "http://api.openweathermap.org/data/2.5/"
+    fun provideBaseUrl(): String = "https://api.openweathermap.org/data/2.5/"
 
 
     @Provides

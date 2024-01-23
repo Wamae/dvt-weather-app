@@ -1,4 +1,4 @@
-package com.dvt.weather_app.ui
+package com.dvt.weather_app.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,57 +17,74 @@ import androidx.compose.ui.res.painterResource
 import com.dvt.weather_app.R
 import com.dvt.weather_app.data.ForecastEntity
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dvt.weather_app.data.CurrentWeatherEntity
+import com.dvt.weather_app.ui.WeatherViewModel
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: WeatherViewModel) {
+    // TODO: Proveide empty state to avoid null exception
+    val currentWeather by viewModel.currentWeather.collectAsState(
+        initial = CurrentWeatherEntity(
+            "Loading...",
+            0,
+            0,
+            0
+        )
+    )
+    // val vehicles by viewModel.forecasts.collectAsState(initial = emptyList())
+
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
-        CurrentWeather()
+        CurrentWeather(currentWeather.weatherType, currentWeather.currentTemperature)
         Column(modifier = Modifier.padding(16.dp)) {
-            CurrentTemperature()
+            CurrentTemperature(currentWeather)
             Forecasts()
         }
     }
 }
 
 @Composable
-fun CurrentWeather() {
-    Box(){
+fun CurrentWeather(weatherType: String, currentTemperature: Int) {
+    Box() {
         Image(
             painter = painterResource(id = R.drawable.forest_sunny),
             contentDescription = "background",
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth
         )
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 75.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("25", fontSize = 70.sp)
-            Text("SUNNY", fontSize = 30.sp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 75.dp), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("$currentTemperature \u00B0", fontSize = 70.sp)
+            Text(weatherType.uppercase(), fontSize = 30.sp)
         }
     }
 
 }
 
 @Composable
-fun CurrentTemperature() {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-        TemperatureItem("min")
-        TemperatureItem("Current")
-        TemperatureItem("max")
+fun CurrentTemperature(currentWeather: CurrentWeatherEntity?) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        TemperatureItem("min", currentWeather!!.maximumTemperature)
+        TemperatureItem("Current", currentWeather.currentTemperature)
+        TemperatureItem("max", currentWeather.maximumTemperature)
     }
 }
-
+// TODO: Extract "$temperature \u00B0" to strings with dynamic value
 @Composable
-fun TemperatureItem(label: String) {
+fun TemperatureItem(label: String, temperature: Int) {
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "20")
+        Text(text = "$temperature \u00B0")
         Text(text = label)
     }
 }
@@ -99,7 +116,7 @@ fun ForecastItem(day: String, weatherType: String, temperature: Int) {
 
 @Composable
 fun getPainterResource(weatherType: String): Painter {
-    return when(weatherType){
+    return when (weatherType) {
         "sunny" -> painterResource(id = R.drawable.ic_sunny)
         else -> painterResource(id = R.drawable.ic_sunny)
     }
