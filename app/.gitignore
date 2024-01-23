@@ -1,5 +1,6 @@
 # Gradle
-.gradle/
+/gradle/
+
 build/
 
 captures
@@ -8,6 +9,7 @@ captures
 
 # IntelliJ .idea folder
 .idea/
+/idea/
 
 # Ignore all auto-generated configs except for app.xml. It's needed as template for the build
 .idea/runConfigurations
