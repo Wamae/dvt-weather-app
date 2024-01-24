@@ -39,7 +39,12 @@ import com.dvt.weather_app.ui.WeatherViewModel
 
 @Composable
 fun getBackgroundColour(weatherType: String): Color {
-    return colorResource(id = R.color.sunny)
+    return when(weatherType){
+        "clouds" -> colorResource(id = R.color.cloudy)
+        "rain" -> colorResource(id = R.color.rainy)
+        "clear" -> colorResource(id = R.color.sunny)
+        else -> colorResource(id = R.color.sunny)
+    }
 }
 
 @Composable

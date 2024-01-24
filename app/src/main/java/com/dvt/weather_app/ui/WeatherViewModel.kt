@@ -1,17 +1,26 @@
 package com.dvt.weather_app.ui
 
+import android.location.Geocoder
+import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dvt.weather_app.db.ForecastEntity
 import com.dvt.weather_app.respositories.OpenWeatherMapRepository
+import com.dvt.weather_app.utils.location.Locator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WeatherViewModel @Inject constructor(private val repository: OpenWeatherMapRepository) :
+class WeatherViewModel @Inject constructor(
+    private val repository: OpenWeatherMapRepository,
+    private val locator: Locator,
+    private val geocoder: Geocoder
+) :
     ViewModel() {
     private val _currentWeather = MutableStateFlow(
         ForecastEntity(
@@ -27,14 +36,6 @@ class WeatherViewModel @Inject constructor(private val repository: OpenWeatherMa
     val forecasts: Flow<List<ForecastEntity>> = _forecasts
 
     init {
-        // initialForecasts = listOf(ForecastEntity("Tuesday", "", 0))
-        // initialForecasts.add(ForecastEntity("Tuesday", "", 0))
-        // initialForecasts.add(ForecastEntity("Wednesday", "", 0))
-        // initialForecasts.add(ForecastEntity("Thursday", "", 0))
-        // initialForecasts.add(ForecastEntity("Friday", "", 0))
-        // initialForecasts.add(ForecastEntity("Saturday", "", 0))
-        // initialForecasts.add(ForecastEntity("Sunday", "", 0))
-        // initialForecasts.add(ForecastEntity("Tuesday", "", 0))
 
         viewModelScope.launch {
             // Extract the two blocks o code into functions
@@ -53,6 +54,17 @@ class WeatherViewModel @Inject constructor(private val repository: OpenWeatherMa
                 _currentWeather.value = forecasts.take(1).first()
                 _forecasts.value = forecastsList.drop(1).toMutableList()
             }
+        }
+    }
+
+    private var _currentLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
+    val currentLocation: Flow<Location?>
+        get() = _currentLocation
+
+    fun getCurrentLocation() = viewModelScope.launch (IO){
+        locator.fetchCurrentLocation().collect{location ->
+            _currentLocation.value = location
+            cancel("New location: $location")
         }
     }
 }
