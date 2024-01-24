@@ -38,16 +38,6 @@ import com.dvt.weather_app.ui.WeatherViewModel
 
 
 @Composable
-fun getBackgroundColour(weatherType: String): Color {
-    return when(weatherType){
-        "clouds" -> colorResource(id = R.color.cloudy)
-        "rain" -> colorResource(id = R.color.rainy)
-        "clear" -> colorResource(id = R.color.sunny)
-        else -> colorResource(id = R.color.sunny)
-    }
-}
-
-@Composable
 fun HomeScreen(viewModel: WeatherViewModel, navController: NavController) {
     // TODO: Proveide empty state to avoid null exception
     val currentWeather by viewModel.currentWeather.collectAsState(
@@ -93,7 +83,7 @@ fun HomeScreen(viewModel: WeatherViewModel, navController: NavController) {
 fun CurrentWeather(weatherType: String, currentTemperature: Int) {
     Box {
         Image(
-            painter = painterResource(id = R.drawable.forest_sunny),
+            painter = getBackground(weatherType),
             contentDescription = "background",
             modifier = Modifier.fillMaxWidth(),
             contentScale = ContentScale.FillWidth
@@ -109,6 +99,7 @@ fun CurrentWeather(weatherType: String, currentTemperature: Int) {
     }
 
 }
+
 
 @Composable
 fun CurrentTemperature(forecastEntity: ForecastEntity) {
@@ -192,7 +183,28 @@ fun ForecastItem(day: String, weatherType: String, temperature: Int) {
 fun getPainterResource(weatherType: String): Painter {
     return when (weatherType.lowercase()) {
         "clear" -> painterResource(id = R.drawable.ic_sunny)
+        "clouds" -> painterResource(id = R.drawable.ic_partly_sunny)
+        "rain" -> painterResource(id = R.drawable.ic_rainy)
         else -> painterResource(id = R.drawable.ic_sunny)
     }
 }
 
+@Composable
+fun getBackgroundColour(weatherType: String): Color {
+    return when (weatherType) {
+        "clouds" -> colorResource(id = R.color.cloudy)
+        "rain" -> colorResource(id = R.color.rainy)
+        "clear" -> colorResource(id = R.color.sunny)
+        else -> colorResource(id = R.color.sunny)
+    }
+}
+
+@Composable
+fun getBackground(weatherType: String): Painter {
+    return when (weatherType) {
+        "clouds" -> painterResource(id = R.drawable.forest_cloudy)
+        "rain" -> painterResource(id = R.drawable.forest_rainy)
+        "clear" -> painterResource(id = R.drawable.forest_sunny)
+        else -> painterResource(id = R.drawable.forest_sunny)
+    }
+}

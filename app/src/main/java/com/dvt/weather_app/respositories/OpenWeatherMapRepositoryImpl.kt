@@ -39,7 +39,7 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                     day = getDayOfWeek(forecast.dt.toLong()),
                     isCurrent = index == 0,
                     cityName = "City name",
-                    weatherType = forecast.weather[0].main,
+                    weatherType = forecast.weather[0].main.lowercase(),
                     currentTemperature = forecast.temp.day.toInt(),
                     minimumTemperature = forecast.temp.min.toInt(),
                     maximumTemperature = forecast.temp.max.toInt(),

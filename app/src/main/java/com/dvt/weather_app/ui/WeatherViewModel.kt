@@ -36,20 +36,21 @@ class WeatherViewModel @Inject constructor(
     private val _forecasts = MutableStateFlow(initialForecasts)
     val forecasts: Flow<List<ForecastEntity>> = _forecasts
 
-    init {
+    private var _currentLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
 
+    val currentLocation: Flow<Location?>
+        get() = _currentLocation
+
+    private var _cityName: MutableStateFlow<String> = MutableStateFlow("Unknown City")
+
+    val cityName: Flow<String>
+        get() = _cityName
+
+    fun getForecasts(location: Location) {
         viewModelScope.launch {
-            // Extract the two blocks o code into functions
-            // TODO: lat lng to  be updated by location
-            // repository.getCurrentWeather(
-            //     latitude = "-1.286389".toDouble(),
-            //     longitude = "36.817223".toDouble()
-            // ).collect { currentWeather ->
-            //     _currentWeather.value = currentWeather
-            // }
 
             repository.getWeatherForecast(
-                latitude = "-1.286389".toDouble(), longitude = "36.817223".toDouble()
+                latitude = location.latitude, longitude = location.latitude
             ).collect { forecasts ->
                 val forecastsList = forecasts.toMutableList()
                 _currentWeather.value = forecasts.take(1).first()
@@ -58,15 +59,43 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    private var _currentLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
-    val currentLocation: Flow<Location?>
-        get() = _currentLocation
-
     fun getCurrentLocation() = viewModelScope.launch(IO) {
         locator.fetchCurrentLocation().collect { location ->
             _currentLocation.value = location
-            Log.i(WeatherViewModel::class.simpleName,"location: $location")
+            Log.i(WeatherViewModel::class.simpleName, "location: $location")
             cancel("New location: $location")
+
+            gecodeLocation(location)
         }
     }
+
+    private fun gecodeLocation(location: Location) {
+        try {
+            // The alternative that is not deprecated is supported by tiramasu and above
+            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+
+
+            if (addresses != null) {
+                if (addresses.isNotEmpty()) {
+                    val address = addresses[0]
+
+                    var newCityName = address.getAddressLine(0)
+
+                    if (newCityName.trim().isEmpty()) {
+                        newCityName = address.subLocality
+                    }
+
+                    _cityName.value = newCityName
+                }
+                // TODO: invoke insert city name to db
+            } else {
+                //     TODO: Possibly set city name to unknown city
+            }
+
+        } catch (e: Exception) {
+
+        }
+
+    }
 }
+

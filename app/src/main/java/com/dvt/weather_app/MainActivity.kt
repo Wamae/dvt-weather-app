@@ -22,18 +22,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.dvt.weather_app.respositories.BaseRepository.Companion.TAG
 import com.dvt.weather_app.ui.WeatherComposeApp
 import com.dvt.weather_app.ui.WeatherViewModel
 import com.dvt.weather_app.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     private val viewModel: WeatherViewModel by viewModels()
+
+    companion object {
+        val TAG: String = MainActivity::class.java.simpleName
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -51,6 +59,7 @@ class MainActivity : ComponentActivity() {
         }
 
         requestLocationPermissions()
+        observeViewModel()
     }
 
     private val requestMultiplePermissionsLauncher =
@@ -67,15 +76,14 @@ class MainActivity : ComponentActivity() {
             .setMessage("Enable location to continue. \nWe use the location to get the weather for your current location.")
             .setPositiveButton("Enable") { dialog, id ->
                 val packageName = BuildConfig.APPLICATION_ID
-                Log.i(TAG,"packagey: $packageName")
+                Log.i(TAG, "packagey: $packageName")
                 dialog.dismiss()
                 val intent = Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.fromParts("package", packageName, null)
                 )
                 this.startActivity(intent)
-            }
-            .setNegativeButton("Cancel") { dialog, id ->
+            }.setNegativeButton("Cancel") { dialog, id ->
                 dialog.dismiss()
                 exitProcess(0)
             }.create().show()
@@ -108,6 +116,17 @@ class MainActivity : ComponentActivity() {
             shouldShowRequestPermissionRationale(permission)
         }
 
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.currentLocation.collect { location ->
+                    Log.e(TAG, "location is $location")
+                    location?.let { viewModel.getForecasts(it) }
+                }
+
+            }
+        }
+    }
 }
 
 @Composable
