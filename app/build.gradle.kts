@@ -77,6 +77,7 @@ dependencies {
     kapt(libs.hilt.android.compiler)
 
     implementation(libs.retrofit)
+    implementation(libs.logging.interceptor)
     implementation(libs.converter.gson)
 
 
