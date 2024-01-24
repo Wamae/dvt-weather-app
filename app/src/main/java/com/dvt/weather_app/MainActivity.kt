@@ -25,9 +25,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.dvt.weather_app.respositories.BaseRepository.Companion.TAG
 import com.dvt.weather_app.ui.WeatherComposeApp
 import com.dvt.weather_app.ui.WeatherViewModel
+import com.dvt.weather_app.ui.cities.CitiesViewModel
 import com.dvt.weather_app.ui.theme.WeatherAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -37,6 +37,8 @@ import kotlin.system.exitProcess
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: WeatherViewModel by viewModels()
+    private val citiesViewModel: CitiesViewModel by viewModels()
+
 
     companion object {
         val TAG: String = MainActivity::class.java.simpleName
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold() { _ ->
                         Column() {
-                            WeatherComposeApp(viewModel)
+                            WeatherComposeApp(viewModel, citiesViewModel)
                         }
                     }
                 }
@@ -119,9 +121,12 @@ class MainActivity : ComponentActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentLocation.collect { location ->
-                    Log.e(TAG, "location is $location")
-                    location?.let { viewModel.getForecasts(it) }
+                viewModel.cityName.collect { cityName ->
+                    Log.e(TAG, "City is: $cityName")
+                    cityName?.let {
+                        // viewModel.gecodeLocation(location)
+                        viewModel.getForecasts(cityName)
+                    }
                 }
 
             }

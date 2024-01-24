@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.dvt.weather_app.R
 import com.dvt.weather_app.db.ForecastEntity
 import com.dvt.weather_app.ui.WeatherViewModel
+import com.dvt.weather_app.utils.time.toFormattedDateTime
 
 
 @Composable
@@ -61,7 +62,12 @@ fun HomeScreen(viewModel: WeatherViewModel, navController: NavController) {
                 .background(color = bgColor)
                 .fillMaxSize()
         ) {
-            CurrentWeather(currentWeather.weatherType, currentWeather.currentTemperature)
+            CurrentWeather(
+                currentWeather.weatherType,
+                currentWeather.currentTemperature,
+                currentWeather.cityName,
+                currentWeather.lastUpdated
+            )
             CurrentTemperature(currentWeather)
             Divider(color = Color.White, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
             Forecasts(forecasts)
@@ -74,13 +80,13 @@ fun HomeScreen(viewModel: WeatherViewModel, navController: NavController) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Add city")
+            Icon(Icons.Filled.Star, contentDescription = "Favorite cities")
         }
     }
 }
 
 @Composable
-fun CurrentWeather(weatherType: String, currentTemperature: Int) {
+fun CurrentWeather(weatherType: String, currentTemperature: Int, cityName: String, lastUpdated: Long) {
     Box {
         Image(
             painter = getBackground(weatherType),
@@ -93,8 +99,10 @@ fun CurrentWeather(weatherType: String, currentTemperature: Int) {
                 .fillMaxWidth()
                 .padding(top = 75.dp), horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(cityName)
             Text("$currentTemperature \u00B0", fontSize = 70.sp)
             Text(weatherType.uppercase(), fontSize = 30.sp)
+            Text("Last Updated: ${toFormattedDateTime(lastUpdated)}")
         }
     }
 
@@ -168,14 +176,15 @@ fun ForecastItem(day: String, weatherType: String, temperature: Int) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(day)
+        Text(day, modifier = Modifier.weight(1f))
         Image(
-            painter = drawable, contentDescription = "forecast",
-            alignment = Alignment.Center
+            painter = drawable, contentDescription = "forecast"
+            , modifier = Modifier.weight(1f)
         )
-        Text(temperature.toString())
+        Text("$temperature \u00b0", modifier = Modifier.weight(1f), textAlign = TextAlign.Right)
     }
 }
 

@@ -55,6 +55,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    testOptions {
+        unitTests {
+            // includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -68,8 +74,10 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material)
     implementation(libs.transportation.consumer)
     implementation(libs.material)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -91,6 +99,15 @@ dependencies {
     implementation(libs.room.ktx)
 
     implementation(libs.play.services.maps)
+    // testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.robolectric)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+    testImplementation(libs.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+
+
 
 }
 

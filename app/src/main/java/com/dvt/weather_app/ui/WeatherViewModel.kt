@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,20 +42,23 @@ class WeatherViewModel @Inject constructor(
     val currentLocation: Flow<Location?>
         get() = _currentLocation
 
-    private var _cityName: MutableStateFlow<String> = MutableStateFlow("Unknown City")
+    private var _cityName: MutableStateFlow<String?> = MutableStateFlow(null)
 
-    val cityName: Flow<String>
+    val cityName: Flow<String?>
         get() = _cityName
 
-    fun getForecasts(location: Location) {
+    fun getForecasts(cityName: String?) {
         viewModelScope.launch {
 
-            repository.getWeatherForecast(
-                latitude = location.latitude, longitude = location.latitude
-            ).collect { forecasts ->
-                val forecastsList = forecasts.toMutableList()
-                _currentWeather.value = forecasts.take(1).first()
-                _forecasts.value = forecastsList.drop(1).toMutableList()
+            _currentLocation.value?.let {
+                repository.getWeatherForecast(
+                    cityName =  cityName,
+                    latitude = it.latitude, longitude = it.longitude
+                ).collect { forecasts ->
+                    val forecastsList = forecasts.toMutableList()
+                    _currentWeather.value = forecasts.take(1).first()
+                    _forecasts.value = forecastsList.drop(1).toMutableList()
+                }
             }
         }
     }
@@ -63,39 +67,54 @@ class WeatherViewModel @Inject constructor(
         locator.fetchCurrentLocation().collect { location ->
             _currentLocation.value = location
             Log.i(WeatherViewModel::class.simpleName, "location: $location")
-            cancel("New location: $location")
 
-            gecodeLocation(location)
+            gecodeLocation(location).collect{ newCityName ->
+                _cityName.value = newCityName
+            }
+
+            cancel("New location: $location")
         }
     }
 
-    private fun gecodeLocation(location: Location) {
+    fun gecodeLocation(location: Location): Flow<String> {
         try {
             // The alternative that is not deprecated is supported by tiramasu and above
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
 
-
             if (addresses != null) {
                 if (addresses.isNotEmpty()) {
                     val address = addresses[0]
+                    val locality = address.locality
 
-                    var newCityName = address.getAddressLine(0)
+                    // var newCityName = address.getAddressLine(0)
+                    var newCityName = locality
 
-                    if (newCityName.trim().isEmpty()) {
+                    /*if (newCityName.trim().isEmpty()) {
                         newCityName = address.subLocality
-                    }
+                    }*/
 
-                    _cityName.value = newCityName
+                    Log.i(WeatherViewModel::class.simpleName, "city name: $newCityName")
+
+                     return flow{
+                        emit(newCityName)
+                    }
                 }
                 // TODO: invoke insert city name to db
             } else {
                 //     TODO: Possibly set city name to unknown city
+                return flow{
+                    emit("Unknown City")
+                }
             }
 
         } catch (e: Exception) {
-
+            return flow{
+                emit("Unknown City")
+            }
         }
-
+        return flow{
+            emit("Unknown City")
+        }
     }
 }
 

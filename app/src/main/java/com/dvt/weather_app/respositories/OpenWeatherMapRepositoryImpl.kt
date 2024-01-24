@@ -1,6 +1,7 @@
 package com.dvt.weather_app.respositories
 
 import android.util.Log
+import com.dvt.weather_app.BuildConfig
 import com.dvt.weather_app.db.ForecastDao
 import com.dvt.weather_app.db.ForecastEntity
 import com.dvt.weather_app.networking.OpenWeatherMapApiService
@@ -22,12 +23,13 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
 
     override suspend fun getWeatherForecast(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        cityName: String?
     ): Flow<List<ForecastEntity>> {
         val response: ForecastResponse? = apiService.getForecast(
-            appId = "d54de98c3aa9aafc8ae3a4b969ad2a7a",
-            latitude = "-1.286389".toDouble(),
-            longitude = "36.817223".toDouble(),
+            appId = BuildConfig.OPEN_WEATHER_API_KEY,
+            latitude = latitude,
+            longitude = longitude,
             units = "metric",
             exclude = "hourly,minutely,alerts,current"
         ).body()
@@ -38,12 +40,12 @@ class OpenWeatherMapRepositoryImpl @Inject constructor(
                 ForecastEntity(
                     day = getDayOfWeek(forecast.dt.toLong()),
                     isCurrent = index == 0,
-                    cityName = "City name",
+                    cityName = cityName ?: "Unknown City",
                     weatherType = forecast.weather[0].main.lowercase(),
                     currentTemperature = forecast.temp.day.toInt(),
                     minimumTemperature = forecast.temp.min.toInt(),
                     maximumTemperature = forecast.temp.max.toInt(),
-                    lastUpdated = java.util.Date().time
+                    lastUpdated = System.currentTimeMillis()
                 )
             )
         }
