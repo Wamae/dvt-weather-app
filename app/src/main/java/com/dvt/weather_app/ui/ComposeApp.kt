@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.dvt.weather_app.ui.cities.CitiesScreen
 import com.dvt.weather_app.ui.home.HomeScreen
 
 @Composable
@@ -13,11 +14,10 @@ fun WeatherComposeApp(viewModel: WeatherViewModel) {
 
     NavHost(navController, startDestination = startRoute) {
         composable("home") { backStackEntry ->
-            // Creates a ViewModel from the current BackStackEntry
-            // Available in the androidx.hilt:hilt-navigation-compose artifact
-            // val viewModel = hiltViewModel<WeatherViewModel>()
-            HomeScreen(viewModel)
+            HomeScreen(viewModel, navController)
         }
-        /* ... */
+        composable("cities") { backStackEntry ->
+            CitiesScreen(viewModel, navController)
+        }
     }
 }

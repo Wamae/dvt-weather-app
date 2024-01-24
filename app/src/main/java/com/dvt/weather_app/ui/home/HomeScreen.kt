@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,9 +31,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.dvt.weather_app.R
-import com.dvt.weather_app.data.CurrentWeatherEntity
-import com.dvt.weather_app.data.ForecastEntity
+import com.dvt.weather_app.db.ForecastEntity
 import com.dvt.weather_app.ui.WeatherViewModel
 
 
@@ -39,11 +43,15 @@ fun getBackgroundColour(weatherType: String): Color {
 }
 
 @Composable
-fun HomeScreen(viewModel: WeatherViewModel) {
+fun HomeScreen(viewModel: WeatherViewModel, navController: NavController) {
     // TODO: Proveide empty state to avoid null exception
     val currentWeather by viewModel.currentWeather.collectAsState(
-        initial = CurrentWeatherEntity(
-            "Loading...",
+        initial = ForecastEntity(
+            "",
+            false,
+            "",
+            "",
+            0,
             0,
             0,
             0
@@ -51,19 +59,28 @@ fun HomeScreen(viewModel: WeatherViewModel) {
     )
     val forecasts by viewModel.forecasts.collectAsState(initial = emptyList())
     val bgColor = getBackgroundColour(currentWeather.weatherType)
-
-    Column(
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .background(color = bgColor)
-            .fillMaxSize()
-    ) {
-        CurrentWeather(currentWeather.weatherType, currentWeather.currentTemperature)
-        // Column(modifier = Modifier.padding(16.dp)) {
-        CurrentTemperature(currentWeather)
-        Divider(color = Color.White, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-        Forecasts(forecasts)
-        // }
+    Box {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier
+                .background(color = bgColor)
+                .fillMaxSize()
+        ) {
+            CurrentWeather(currentWeather.weatherType, currentWeather.currentTemperature)
+            CurrentTemperature(currentWeather)
+            Divider(color = Color.White, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+            Forecasts(forecasts)
+        }
+        FloatingActionButton(
+            onClick = {
+                navController.navigate("cities/")
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "Add city")
+        }
     }
 }
 
@@ -89,7 +106,7 @@ fun CurrentWeather(weatherType: String, currentTemperature: Int) {
 }
 
 @Composable
-fun CurrentTemperature(currentWeather: CurrentWeatherEntity?) {
+fun CurrentTemperature(forecastEntity: ForecastEntity) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,13 +114,13 @@ fun CurrentTemperature(currentWeather: CurrentWeatherEntity?) {
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         Text(
-            text = "${currentWeather!!.minimumTemperature} \u00B0",
+            text = "${forecastEntity!!.minimumTemperature} \u00B0",
         )
         Text(
-            text = "${currentWeather.currentTemperature} \u00B0",
+            text = "${forecastEntity.currentTemperature} \u00B0",
             textAlign = TextAlign.Center
         )
-        Text(text = "${currentWeather.maximumTemperature} \u00B0")
+        Text(text = "${forecastEntity.maximumTemperature} \u00B0")
     }
     Row(
         modifier = Modifier
@@ -142,7 +159,7 @@ fun Forecasts(forecasts: List<ForecastEntity>) {
             .padding(top = 8.dp)
     ) {
         items(forecasts) { forecast ->
-            ForecastItem(forecast.day, forecast.weatherType, forecast.temperature)
+            ForecastItem(forecast.day, forecast.weatherType, forecast.currentTemperature)
         }
     }
 }
