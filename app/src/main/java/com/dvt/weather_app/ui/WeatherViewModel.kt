@@ -49,7 +49,9 @@ class WeatherViewModel @Inject constructor(private val repository: OpenWeatherMa
             repository.getWeatherForecast(
                 latitude = "-1.286389".toDouble(), longitude = "36.817223".toDouble()
             ).collect { forecasts ->
-                _forecasts.value = forecasts.toMutableList()
+                val forecastsList = forecasts.toMutableList()
+                _currentWeather.value = forecasts.take(1).first()
+                _forecasts.value = forecastsList.drop(1).toMutableList()
             }
         }
     }

@@ -12,7 +12,7 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-class BaseRepository {
+open class BaseRepository {
     companion object {
         val TAG = BaseRepository::class.simpleName
     }
