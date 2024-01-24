@@ -9,4 +9,10 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.21-1.0.15" apply false
 
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.secrets.gradle.plugin)
+    }
+}
 true // Needed to make the Suppress annotation work for the plugins block

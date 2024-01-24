@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
     private fun showAskForLocationDialog() {
         AlertDialog.Builder(this).setTitle("Location Permission")
-            .setMessage("Enable location to continue")
+            .setMessage("Enable location to continue. \nWe use the location to get the weather for your current location.")
             .setPositiveButton("Enable") { dialog, id ->
                 val packageName = BuildConfig.APPLICATION_ID
                 Log.i(TAG,"packagey: $packageName")
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
-    fun requestLocationPermissions() {
+    private fun requestLocationPermissions() {
         val permissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
         )

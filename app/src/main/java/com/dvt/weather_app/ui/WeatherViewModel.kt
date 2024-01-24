@@ -2,6 +2,7 @@ package com.dvt.weather_app.ui
 
 import android.location.Geocoder
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dvt.weather_app.db.ForecastEntity
@@ -61,9 +62,10 @@ class WeatherViewModel @Inject constructor(
     val currentLocation: Flow<Location?>
         get() = _currentLocation
 
-    fun getCurrentLocation() = viewModelScope.launch (IO){
-        locator.fetchCurrentLocation().collect{location ->
+    fun getCurrentLocation() = viewModelScope.launch(IO) {
+        locator.fetchCurrentLocation().collect { location ->
             _currentLocation.value = location
+            Log.i(WeatherViewModel::class.simpleName,"location: $location")
             cancel("New location: $location")
         }
     }

@@ -9,5 +9,5 @@ import com.dvt.weather_app.ui.WeatherViewModel
 @Composable
 fun CitiesScreen(viewModel: WeatherViewModel, navController: NavHostController) {
     val viewModel: CitiesViewModel = hiltViewModel()
-
+    
 }
