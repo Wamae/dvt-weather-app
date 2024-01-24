@@ -5,7 +5,7 @@
 
 - [A valid Google Maps Api Key](https://developers.google.com/maps/documentation/android-sdk/get-api-key)
 - [A valid Open Weather API Key](https://openweathermap.org/appid)
-**NOTE: This uses the 3.0 version of the API**
+- **NOTE: This uses the 3.0 version of the API**
 
 ## Setup
 - Create `secrets.properties` from `local.defaults.properties`
