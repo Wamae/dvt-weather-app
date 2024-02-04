@@ -42,7 +42,7 @@ Develop an application that:
 ### TODOs   
 * Tests
     * [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing)
-    * [[JUnit](https://junit.org/junit4/) - a simple framework to write repeatable unit tests.
+    * [JUnit](https://junit.org/junit4/) - a simple framework to write repeatable unit tests.
     * [MockK](https://github.com/mockk) - mocking library for Kotlin.
 
 * CI/CD
