@@ -39,9 +39,15 @@ Develop an application that:
 
 * Architecture
     * MVVM - Model View View Model
-* Tests(TODO)
-    * [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing) ([JUnit](https://junit.org/junit4/)) - a simple framework to write repeatable tests.
-    * [MockK](https://github.com/mockk) - mocking library for Kotlin
+### TODOs   
+* Tests
+    * [Unit Tests](https://en.wikipedia.org/wiki/Unit_testing)
+    * [[JUnit](https://junit.org/junit4/)) - a simple framework to write repeatable unit tests.
+    * [MockK](https://github.com/mockk) - mocking library for Kotlin.
 
-* CI/CD (TODO)
-    * Github Actions
+* CI/CD
+    * GitHub Actions
+
+* States
+    * Update the ViewModels to use states
+      
